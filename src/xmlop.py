@@ -105,6 +105,8 @@ class XMLOptionParser(object):
 
         # iterate over cfg files
         for d in dirlist:
+            if d == '.svn':
+                continue
             # build path to file
             filepath = dirpath + os.sep + d + os.sep + "course_config.xml"
             # parse cfg file

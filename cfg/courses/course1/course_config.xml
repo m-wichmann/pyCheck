@@ -3,7 +3,8 @@
 
     <name>test course 1</name>
 
-    <svn-path>http://path/to/svn/</svn-path>
+<!--    <svn-path>http://svn.code.sf.net/p/freenono/svn/trunk</svn-path> -->
+    <svn-path>https://code.ostfalia.de/svn/i-prg/</svn-path>
 
     <advisers>
         <adviser>Max Mustermann</adviser>
@@ -12,12 +13,12 @@
 
     <exercises>
         <exercise>
-            <name>Exercise 1</name>
+            <name>Prog-Aufgabe1</name>
             <test-class-path>/path/to/test/classes</test-class-path>
         </exercise>
 
         <exercise>
-            <name>Exercise 2</name>
+            <name>Prog-Aufgabe2</name>
         </exercise>
     </exercises>
 

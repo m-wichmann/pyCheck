@@ -54,10 +54,15 @@ class JCompile(object):
             return
 
         # build command
+        # TODO:
+        # java -cp /path/to/classpath:/more/classpath
         cmd = ["javac"]
 
         for f in src_files:
             cmd.append(f)
+
+        print("jcompile")
+        print(cmd)
 
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         out, err = p.communicate()

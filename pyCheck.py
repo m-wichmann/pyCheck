@@ -163,7 +163,7 @@ class pyCheck(object):
 
             ##########
             # clean up the checkedout repo
-            util_obj.clean_tmp_dir()
+#            util_obj.clean_tmp_dir()
 
 
 

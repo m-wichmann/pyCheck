@@ -3,7 +3,8 @@
 
     <name>test course 2</name>
 
-    <svn-path>http://path/to/svn</svn-path>
+<!--    <svn-path>http://svn.code.sf.net/p/freenono/svn/trunk</svn-path> -->
+    <svn-path>https://code.ostfalia.de/svn/i-prg/</svn-path>
 
     <advisers>
         <adviser>Max Mustermann</adviser>
