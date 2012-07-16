@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<course>
+
+    <name>test course 2</name>
+
+    <svn-path>http://path/to/svn</svn-path>
+
+    <advisers>
+        <adviser>Max Mustermann</adviser>
+        <adviser>Maxine Musterfrau</adviser>
+    </advisers>
+
+    <exercises>
+        <exercise>
+            <name>Exercise 1</name>
+            <omit-junit>true</omit-junit>
+        </exercise>
+
+        <exercise>
+            <name>Exercise 2</name>
+            <checkstyle-config>/path/to/another/checkstyle/config</checkstyle-config>
+        </exercise>
+    </exercises>
+
+</course>

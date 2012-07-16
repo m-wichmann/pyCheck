@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <bin-path>/usr/bin/checkstyle</bin-path>
+    <checkstyle-config>/home/erebos/temp/checkstyle/sun_checks.xml</checkstyle-config>
+</config>
+

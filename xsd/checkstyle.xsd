@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+            XML schema to validate checkstyle config for pyCheck.
+        </xsd:documentation>
+    </xsd:annotation>
+
+    <xsd:element name="config" type="ConfigType"/>
+
+    <xsd:complexType name="ConfigType">
+        <xsd:sequence>
+            <xsd:element name="bin-path" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="checkstyle-config" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>

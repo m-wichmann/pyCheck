@@ -1,0 +1,80 @@
+==========
+pyCheck
+=====
+pyCheck is a little tool to check and evaluate practical programming exercises. It takes code from several groups from an SVN repository and compiles it. After that it checks via junit and checkstyle and reports the results into HTML format.
+
+This project is licensed under LGPL version 3.0 or newer. You can find the license at www.gnu.org/licenses/lgpl.html or in the COPYRIGHT file.
+
+
+==========
+Ideas and TODOs
+=====
+- Fool proof all this os dependend stuff like path seperator (os.sep) and so on
+- Do we have to compile the JUnit classes?
+- Implement check if config files (checkstyle/junit) exist
+- Implement check for necassary programms
+- try lambda stuff (especially for the path transformation...);-)
+- add option to call course/exercise
+- add xml option date_start and date_due to exercises to define range
+
+
+==========
+Program flow
+=====
+svn checkout (checkout all groups for one course; also check if rev newer than last check)
+compiling
+junit
+checkstyle
+output results (html file per group)
+
+
+==========
+Target SVN structure
+=====
+- ./                                <= Main SVN server for one course
+    - ./group1                      <= Directory for every group
+        - ./group1/exercise1        <= Sub-Directory for every exercise (contains eclipse prroject)
+
+
+==========
+File structure
+=====
+- ./
+    - ./aux/                        <= Auxiliary data (old results, what revision was tested...)
+
+    - ./cfg/                                        <= Config (Course, Exercises, JUnit, Checkstyle)
+        - ./cfg/courses/course1/course_config.xml   <= XML config for first course
+        - ./cfg/junit.xml                           <= JUnit config
+        - ./cfg/checkstyle.xml                      <= Checkstyle config
+        - ./cfg/template.html                       <= HTML output template
+
+    - ./out/                        <= Outputdirectory (www)
+
+    - ./src/                        <= pyCheck source code
+        - ./src/config.py           <= class representation of XML config (necessary?)
+        - ./src/ifCS.py             <= Checkstyle interface code
+        - ./src/ifJUnit.py          <= JUnit interface code
+        - ./src/ifSVN.py            <= SVN interface code
+        - ./src/jcompile.py         <= compile java project
+        - ./src/model.py            <= pyCheck model classes (course, exercise...)
+        - ./src/output.py           <= output of the results
+        - ./src/util.py             <= util functions (necessary?)
+        - ./src/xmlop.py            <= XML options parser
+
+    - ./tmp/                        <= Temp data (checked out source code, compiled source code...)
+
+    - ./xsd/                        <= XML Schemas to validate config files
+
+    - ./pyCheck.py                  <= Main executable (parameters via command line options)
+
+
+==========
+Helpful stuff for programming/testing
+=====
+- Validate xsd file against official xsd definition
+    xmllint --noout -schema http://www.w3.org/2001/XMLSchema.xsd xsd/course.xsd
+- Validate xml file against own xsd file
+    xmllint --noout -schema xsd/junit.xsd cfg/junit.xml
+- Check python code style
+    pep8 pyCheck.py src/*.py
+    pylint pyCheck.py src/*.py 

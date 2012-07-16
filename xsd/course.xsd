@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+            XML schema to validate course config.
+        </xsd:documentation>
+    </xsd:annotation>
+
+    <xsd:element name="course" type="CourseType"/>
+
+    <xsd:complexType name="CourseType">
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="svn-path" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="advisers" type="AdvisersType" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="exercises" type="ExercisesType" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="AdvisersType">
+        <xsd:sequence>
+            <xsd:element name="adviser" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="ExercisesType">
+        <xsd:sequence>
+            <xsd:element name="exercise" type="ExerciseType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="ExerciseType">
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="checkstyle-config" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="test-class-path" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="omit-junit" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>
