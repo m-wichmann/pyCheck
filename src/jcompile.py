@@ -24,6 +24,7 @@
 #####
 
 import os
+import subprocess
 
 class JCompile(object):
     """Compile java/eclipse project"""
@@ -41,6 +42,8 @@ class JCompile(object):
     def compile_project(self, project_path, course):
         """compile every .java file located in the given path"""
 
+        print("1")
+
         # TODO:
         # - get config data and use it
         # - define the Classpath
@@ -48,6 +51,22 @@ class JCompile(object):
 
         # all .java src files located in the project_path folder
         src_files = self.__filter_src_files(project_path)
+
+        if len(src_files) == 0:
+            return
+
+        # build command
+        cmd = ["javac"]
+
+        for f in src_files:
+            cmd.append(f)
+
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        out, err = p.communicate()
+
+        # returncode is not 0 if somethin went wrong
+        if p.returncode != 0:
+            return "An pyCheck error occured"
 
 
 

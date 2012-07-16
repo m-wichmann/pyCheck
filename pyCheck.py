@@ -106,7 +106,6 @@ class pyCheck(object):
             # svn checkout and check if current version was already checked (auxilary data)
             # - checkout course main svn to ./tmp/ from course.svn_path
             if cmd_options.skip_svn is not True:
-                # TODO
                 svn.checkout_repo(cmd_options, course)
 
             ##########
@@ -164,8 +163,7 @@ class pyCheck(object):
 
             ##########
             # clean up the checkedout repo
-            # TODO: commented out until svn checkout works...
-#            util_obj.clean_tmp_dir()
+            util_obj.clean_tmp_dir()
 
 
 

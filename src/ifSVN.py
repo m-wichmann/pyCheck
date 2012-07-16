@@ -27,7 +27,7 @@
 # - pysvn for python3 is not available through ubuntu repos
 # - possible interesting functions: info2, status, checkout
 
-#import pysvn
+import subprocess
 
 class IfSVN(object):
     """Main class for the SVN interface"""
@@ -43,4 +43,43 @@ class IfSVN(object):
 
     def checkout_repo(self, cmd_options, course):
         """checkout the repo at url to path"""
-        pass
+
+        output_path = "./tmp/"
+
+        # build command
+        cmd = ["svn", "checkout", course.svn_path, output_path]
+
+        # TODO:
+        # - check if svn really behaves like expected
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        out, err = p.communicate()
+
+        # relevant data:
+        # print(p.returncode)
+        # print(out)
+
+        # returncode is not 0 if e.g. the config xml wasn't found or valid
+        if p.returncode != 0:
+            return "An pyCheck error occured"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
