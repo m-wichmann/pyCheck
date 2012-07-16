@@ -42,8 +42,6 @@ class JCompile(object):
     def compile_project(self, project_path, course):
         """compile every .java file located in the given path"""
 
-        print("1")
-
         # TODO:
         # - get config data and use it
         # - define the Classpath
