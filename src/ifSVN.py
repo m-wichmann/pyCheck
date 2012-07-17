@@ -60,6 +60,9 @@ class IfSVN(object):
         # print(p.returncode)
         # print(out)
 
+        # TODO:
+        # - if hostname can not be resolved (e.g. no network) svn doesn't return an error code -.-
+
         # returncode is not 0 if e.g. the config xml wasn't found or valid
         if p.returncode != 0:
             return "An pyCheck error occured"

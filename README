@@ -16,7 +16,10 @@ Ideas and TODOs
 - try lambda stuff (especially for the path transformation...);-)
 - add option to call course/exercise
 - add xml option date_start and date_due to exercises to define range
-- extend Classpath with own classes/jars (junit, swt, other...)
+- extend Classpath with own classes/jars (junit, swt, other...). Maybe add a jcompile.xml config?
+- should we do checks if something (e.g. svn) didn't work?
+- implement some timing checks. For example: how much time do we need for a svn pull
+- add support for pypy and maybe python2 via 3to2 or python six
 
 
 ==========
