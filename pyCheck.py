@@ -75,6 +75,10 @@ class pyCheck(object):
         # parse cmd line options
         cmd_options = self.__parse_options()
 
+        # TODO: output cmd options seperatly to logfile
+        logger.info("PyCheck started with following command line options:")
+        logger.info(cmd_options)
+
         ##########
         # check cmd options for options that would quit programm early...
         if cmd_options.validate_config is True:
@@ -92,6 +96,7 @@ class pyCheck(object):
         ##########
         # parse xml file options
         # returns some option objects
+        logger.info("Parsing XML options")
         xmlop_obj = xmlop.XMLOptionParser()
 
         checkstyle_config = xmlop_obj.parse_checkstyle_cfg("./cfg/checkstyle.xml")
@@ -106,12 +111,13 @@ class pyCheck(object):
         ##########
         # iterate over courses
         for course in configs["courses_config"]:
+            logger.info("Current course: " + course.name)
 
             ##########
             # svn checkout and check if current version was already checked (auxilary data)
             # - checkout course main svn to ./tmp/ from course.svn_path
             if cmd_options.skip_svn is not True:
-                print("SVN checkout...")
+                logger.info("SVN checkout...")
                 svn.checkout_repo(cmd_options, course)
 
             ##########
@@ -121,6 +127,9 @@ class pyCheck(object):
             for directory in temp:
                 if os.path.isdir('./tmp/' + course.name + '/' + directory):
                     groupdirs.append(directory)
+
+            logger.info("Exercise count: " + str(len(course.exercises)))
+            logger.info("Group count: " + str(len(groupdirs)))
 
             ##########
             # iterate over groups in ./tmp/GROUP/
