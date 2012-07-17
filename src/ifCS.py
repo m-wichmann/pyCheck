@@ -47,15 +47,12 @@ class IfCS(object):
         # build command
         cmd = [checkstyle_config["bin-path"], "-c", cs_config_xml, "-f", "xml", "-r", project_dir]
 
-        print("checkstyle")
-        print(cmd)
-
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         out, err = p.communicate()
 
         # relevant data:
 #        print(p.returncode)
-        print(out)
+#        print(out)
 
         # returncode is not 0 if e.g. the config xml wasn't found or valid
         if p.returncode != 0:

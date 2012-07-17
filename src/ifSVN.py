@@ -44,7 +44,9 @@ class IfSVN(object):
     def checkout_repo(self, cmd_options, course):
         """checkout the repo at url to path"""
 
-        output_path = "./tmp/"
+        output_path = "./tmp/" + course.name
+
+        print(output_path)
 
         # build command
         cmd = ["svn", "checkout", course.svn_path, output_path]

@@ -31,6 +31,8 @@ from optparse import OptionParser
 from optparse import OptionGroup
 import os
 import subprocess
+import logging.handlers
+
 
 # All imports to test if it works
 import src.config as config
@@ -57,6 +59,9 @@ class pyCheck(object):
 
     def pycheck_main(self):
         """pyCheck main function"""
+
+        # init logger
+        logger = self.__init_logger()
 
         # init for later use
         util_obj = util.Util()
@@ -106,14 +111,15 @@ class pyCheck(object):
             # svn checkout and check if current version was already checked (auxilary data)
             # - checkout course main svn to ./tmp/ from course.svn_path
             if cmd_options.skip_svn is not True:
+                print("SVN checkout...")
                 svn.checkout_repo(cmd_options, course)
 
             ##########
             # iterate over groups in ./tmp/
-            temp = os.listdir('./tmp')
+            temp = os.listdir('./tmp/'+ course.name)
             groupdirs = []
             for directory in temp:
-                if os.path.isdir('./tmp/' + directory):
+                if os.path.isdir('./tmp/' + course.name + '/' + directory):
                     groupdirs.append(directory)
 
             ##########
@@ -129,12 +135,13 @@ class pyCheck(object):
                 for exercise in course.exercises:
 
                     # build path for this exercise
-                    current_dir = './tmp/' + groupdir + '/' + exercise.name
+                    current_dir = './tmp/' + course.name + '/' + groupdir + '/' + exercise.name
 
                     ##########
                     # compile java code
                     if cmd_options.skip_compile is not True:
                         # TODO
+                        print("Compiling java code...")
                         jcompile_obj.compile_project(current_dir, course)
 
                     ##########
@@ -143,6 +150,7 @@ class pyCheck(object):
                     junit_result = None
                     if cmd_options.skip_junit is not True:
                         # TODO
+                        print("JUnit test...")
                         temp = junit.run_junit_test(current_dir, junit_config, exercise)
                         junit_results.append(temp)
 
@@ -152,6 +160,7 @@ class pyCheck(object):
                     checkstyle_result = None
                     if cmd_options.skip_checkstyle is not True:
                         # TODO
+                        print("Running Checkstyle...")
                         temp = checkstyle.run_checkstyle(current_dir, checkstyle_config, exercise)
                         checkstyle_results.append(temp)
 
@@ -159,10 +168,12 @@ class pyCheck(object):
                 # output results for all exercises to file
                 if cmd_options.skip_output is not True:
                     # TODO
+                    print("Generating results...")
                     output_obj.generate_result(junit_results, checkstyle_results, course)
 
             ##########
             # clean up the checkedout repo
+#            print("Cleaning SVN Repos...")
 #            util_obj.clean_tmp_dir()
 
 
@@ -214,6 +225,35 @@ class pyCheck(object):
 
         # return options
         return ret
+
+
+    def __init_logger(self):
+        """Init and return logger."""
+        # get logger object
+        logger = logging.getLogger('pyCheck')
+        logger.setLevel(logging.DEBUG)
+
+        # set file handle for log file
+        # use a rotating log file with max 200kb and backup up to 3 log files
+        logfile = './log/pyCheck.log'
+        try:
+            log_fh = logging.handlers.RotatingFileHandler(logfile, maxBytes=200000, backupCount=3)
+        except IOError:
+            print("Could not open log file!")
+            return None
+
+        log_fh.setLevel(logging.DEBUG)
+        # set formatter for logger
+        formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)-8s - %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
+        log_fh.setFormatter(formatter)
+        # add file handle to logger
+        logger.addHandler(log_fh)
+
+        logger.info("==========")
+
+        return logger
+
+
 
 
     def __validate_config(self):
