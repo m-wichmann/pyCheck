@@ -24,12 +24,14 @@
 #####
 
 import os
+import time
 
 class Util(object):
     """Util class for pyCheck"""
 
     def __init__(self):
-        pass
+        global timer
+        timer = {}
 
     def __del__(self):
         pass
@@ -50,3 +52,22 @@ class Util(object):
             # ...and then all directories.
             for d in dirs:
                 os.rmdir(os.path.join(root, d))
+
+
+    def start_timer(self, name):
+        """store current time under name"""
+        timer[name] = time.time()
+
+
+    def stop_timer(self, name):
+        """take time from name and calculate difference"""
+        try:
+            ret = time.time() - timer[name]
+        except KeyError:
+            ret = 0
+        return ret
+
+
+
+
+

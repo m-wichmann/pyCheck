@@ -42,8 +42,6 @@ class JCompile(object):
     def compile_project(self, project_path, jcompile_config, course):
         """compile every .java file located in the given path"""
 
-        print(jcompile_config)
-
         # TODO:
         # - get config data and use it
         # - define the Classpath
@@ -62,9 +60,6 @@ class JCompile(object):
 
         for f in src_files:
             cmd.append(f)
-
-        print("jcompile")
-        print(cmd)
 
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         out, err = p.communicate()

@@ -46,8 +46,6 @@ class IfSVN(object):
 
         output_path = "./tmp/" + course.name
 
-        print(output_path)
-
         # build command
         cmd = ["svn", "checkout", course.svn_path, output_path]
 

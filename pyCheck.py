@@ -60,132 +60,198 @@ class pyCheck(object):
     def pycheck_main(self):
         """pyCheck main function"""
 
-        # init logger
-        logger = self.__init_logger()
+        # TODO:
+        # ATTENTION: this class now relies heavily on global vars. I know its not nice, but it seemed nicer than returning five objects
 
-        # init for later use
-        util_obj = util.Util()
-        junit = ifJUnit.IfJUnit()
-        checkstyle = ifCS.IfCS()
-        svn = ifSVN.IfSVN()
-        output_obj = output.Output()
-        jcompile_obj = jcompile.JCompile()
-
-        ##########
-        # parse cmd line options
-        cmd_options = self.__parse_options()
-
-        # TODO: output cmd options seperatly to logfile
-        logger.info("PyCheck started with following command line options:")
-        logger.info(cmd_options)
+        # init objects, logger and stuff
+        self.__pyCheck_init()
 
         ##########
         # check cmd options for options that would quit programm early...
         if cmd_options.validate_config is True:
             self.__validate_config()
-
             # return/quit early
             return
 
         if cmd_options.test_pycheck is True:
             self.__test_pycheck()
-
             # return/quit early
             return
 
+        # parse xml config files
+        self.__parse_xml_options()
+
+        ##########
+        # iterate over courses
+        for course in configs["courses_config"]:
+            self.__process_course(course)
+
+        self.__pyCheck_cleanup()
+
+
+    def __pyCheck_init(self):
+        """initialize all needed objects and the logger/timing stuff. Also parse cmd options"""
+        # init logger
+        global logger
+        logger = self.__init_logger()
+
+        # init for later use
+        global util_obj
+        util_obj = util.Util()
+        global junit
+        junit = ifJUnit.IfJUnit()
+        global checkstyle
+        checkstyle = ifCS.IfCS()
+        global svn
+        svn = ifSVN.IfSVN()
+        global output_obj
+        output_obj = output.Output()
+        global jcompile_obj
+        jcompile_obj = jcompile.JCompile()
+
+        global timing
+        timing = {"overall": [], "xmlparser": [], "svn": [], "jcompile": [], "junit": [], "checkstyle": [], "output": []}
+        util_obj.start_timer("overall")
+
+
+        ##########
+        # parse cmd line options
+        global cmd_options
+        cmd_options = self.__parse_options()
+
+        # TODO: output cmd options seperatly to logfile
+        logger.info("PyCheck started with following command line options:")
+        logger.info(cmd_options)
+        
+
+    def __parse_xml_options(self):
+        """parse xml config files"""
         ##########
         # parse xml file options
         # returns some option objects
         logger.info("Parsing XML options")
+
+        util_obj.start_timer("xmlparser")
+
+        global xmlop_obj
         xmlop_obj = xmlop.XMLOptionParser()
 
+        global checkstyle_config
         checkstyle_config = xmlop_obj.parse_checkstyle_cfg("./cfg/checkstyle.xml")
+        global junit_config
         junit_config = xmlop_obj.parse_junit_cfg("./cfg/junit.xml")
+        global jcompile_config
         jcompile_config = xmlop_obj.parse_jcompile_cfg("./cfg/jcompile.xml")
+        global courses_config
         courses_config = xmlop_obj.parse_courses_cfg("./cfg/courses/")
 
         ##########
         # do something with the options from cmd line and xml files
         # TODO: mhh... I'm not sure anymore that this makes sense?!
+        global configs
         configs = self.__merge_configs(cmd_options, checkstyle_config, junit_config, jcompile_config, courses_config)
 
+        timing["xmlparser"].append(util_obj.stop_timer("xmlparser"))
+
+
+    def __process_course(self, course):
+        """process one course. Meaning svn checkout and then call method to process groups"""
+        logger.info("Current course: " + course.name)
+
         ##########
-        # iterate over courses
-        for course in configs["courses_config"]:
-            logger.info("Current course: " + course.name)
+        # svn checkout and check if current version was already checked (auxilary data)
+        # - checkout course main svn to ./tmp/ from course.svn_path
+        if cmd_options.skip_svn is not True:
+            util_obj.start_timer("svn")
+            logger.info("SVN checkout...")
+            svn.checkout_repo(cmd_options, course)
+            timing["svn"].append(util_obj.stop_timer("svn"))
 
-            ##########
-            # svn checkout and check if current version was already checked (auxilary data)
-            # - checkout course main svn to ./tmp/ from course.svn_path
-            if cmd_options.skip_svn is not True:
-                logger.info("SVN checkout...")
-                svn.checkout_repo(cmd_options, course)
+        ##########
+        # iterate over groups in ./tmp/
+        temp = os.listdir('./tmp/'+ course.name)
+        groupdirs = []
+        for directory in temp:
+            if os.path.isdir('./tmp/' + course.name + '/' + directory):
+                groupdirs.append(directory)
 
-            ##########
-            # iterate over groups in ./tmp/
-            temp = os.listdir('./tmp/'+ course.name)
-            groupdirs = []
-            for directory in temp:
-                if os.path.isdir('./tmp/' + course.name + '/' + directory):
-                    groupdirs.append(directory)
+        logger.info("Exercise count: " + str(len(course.exercises)))
+        logger.info("Group count: " + str(len(groupdirs)))
 
-            logger.info("Exercise count: " + str(len(course.exercises)))
-            logger.info("Group count: " + str(len(groupdirs)))
+        ##########
+        # iterate over groups in ./tmp/GROUP/
+        for groupdir in groupdirs:
+            self.__process_group(course, groupdir)
 
-            ##########
-            # iterate over groups in ./tmp/GROUP/
-            for groupdir in groupdirs:
-
-                # TODO: maybe make this into a dict
-                junit_results = []
-                checkstyle_results = []
-
-                ##########
-                # iterate over exercises
-                for exercise in course.exercises:
-
-                    # build path for this exercise
-                    current_dir = './tmp/' + course.name + '/' + groupdir + '/' + exercise.name
-
-                    ##########
-                    # compile java code
-                    if cmd_options.skip_compile is not True:
-                        # TODO
-                        print("Compiling java code...")
-                        jcompile_obj.compile_project(current_dir, jcompile_config, course)
-
-                    ##########
-                    # junit tests
-                    # return result object
-                    junit_result = None
-                    if cmd_options.skip_junit is not True:
-                        # TODO
-                        print("JUnit test...")
-                        temp = junit.run_junit_test(current_dir, junit_config, exercise)
-                        junit_results.append(temp)
-
-                    ##########
-                    # checkstyle
-                    # return result object
-                    checkstyle_result = None
-                    if cmd_options.skip_checkstyle is not True:
-                        # TODO
-                        print("Running Checkstyle...")
-                        temp = checkstyle.run_checkstyle(current_dir, checkstyle_config, exercise)
-                        checkstyle_results.append(temp)
-
-                ##########
-                # output results for all exercises to file
-                if cmd_options.skip_output is not True:
-                    # TODO
-                    print("Generating results...")
-                    output_obj.generate_result(junit_results, checkstyle_results, course)
-
-            ##########
-            # clean up the checkedout repo
+        ##########
+        # clean up the checkedout repo
 #            print("Cleaning SVN Repos...")
 #            util_obj.clean_tmp_dir()
 
+
+    def __process_group(self, course, groupdir):
+        """process one group (groupdir). Meaning: jcompile, junit, checkstyle"""
+        # TODO: maybe make this into a dict
+        junit_results = []
+        checkstyle_results = []
+
+        ##########
+        # iterate over exercises
+        for exercise in course.exercises:
+
+            # build path for this exercise
+            current_dir = './tmp/' + course.name + '/' + groupdir + '/' + exercise.name
+
+            ##########
+            # compile java code
+            if cmd_options.skip_compile is not True:
+                # TODO
+                print("Compiling java code...")
+                util_obj.start_timer("jcompile")
+                jcompile_obj.compile_project(current_dir, jcompile_config, course)
+                timing["jcompile"].append(util_obj.stop_timer("jcompile"))
+
+            ##########
+            # junit tests
+            # return result object
+            junit_result = None
+            if cmd_options.skip_junit is not True:
+                # TODO
+                print("JUnit test...")
+                util_obj.start_timer("junit")
+                temp = junit.run_junit_test(current_dir, junit_config, exercise)
+                junit_results.append(temp)
+                timing["junit"].append(util_obj.stop_timer("junit"))
+
+            ##########
+            # checkstyle
+            # return result object
+            checkstyle_result = None
+            if cmd_options.skip_checkstyle is not True:
+                # TODO
+                print("Running Checkstyle...")
+                util_obj.start_timer("checkstyle")
+                temp = checkstyle.run_checkstyle(current_dir, checkstyle_config, exercise)
+                checkstyle_results.append(temp)
+                timing["checkstyle"].append(util_obj.stop_timer("checkstyle"))
+
+        ##########
+        # output results for all exercises to file
+        if cmd_options.skip_output is not True:
+            # TODO
+            print("Generating results...")
+            util_obj.start_timer("output")
+            output_obj.generate_result(junit_results, checkstyle_results, course)
+            timing["output"].append(util_obj.stop_timer("output"))
+
+
+    def __pyCheck_cleanup(self):
+        """stop timer and print results. Maybe do other stuff in the future"""
+        timing["overall"].append(util_obj.stop_timer("overall"))
+
+        print("=====")
+        print(timing)
+        print("=====")
 
 
     def __parse_options(self):
@@ -282,6 +348,8 @@ class pyCheck(object):
 
         # validate junit.xml
         ret += self.__call_xmllint(pycheck_dir + "/xsd/junit.xsd", [pycheck_dir + "/cfg/junit.xml"])
+        # validate jcompile.xml
+        ret += self.__call_xmllint(pycheck_dir + "/xsd/jcompile.xsd", [pycheck_dir + "/cfg/jcompile.xml"])
         # validate checkstyle.xml
         ret += self.__call_xmllint(pycheck_dir + "/xsd/checkstyle.xsd", [pycheck_dir + "/cfg/checkstyle.xml"])
 

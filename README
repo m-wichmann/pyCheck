@@ -21,6 +21,8 @@ Ideas and TODOs
 - implement some timing checks. For example: how much time do we need for a svn pull
 - add support for pypy and maybe python2 via 3to2 or python six
 - Improve xml parsing. Especially blanks in arguments (indentation) that are parsed into our tree. Also, xml tags without content break the parsing...
+- add progress bar ;-)
+- use threads
 
 
 ==========
