@@ -39,8 +39,10 @@ class JCompile(object):
         pass
 
 
-    def compile_project(self, project_path, course):
+    def compile_project(self, project_path, jcompile_config, course):
         """compile every .java file located in the given path"""
+
+        print(jcompile_config)
 
         # TODO:
         # - get config data and use it

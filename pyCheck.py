@@ -101,12 +101,13 @@ class pyCheck(object):
 
         checkstyle_config = xmlop_obj.parse_checkstyle_cfg("./cfg/checkstyle.xml")
         junit_config = xmlop_obj.parse_junit_cfg("./cfg/junit.xml")
+        jcompile_config = xmlop_obj.parse_jcompile_cfg("./cfg/jcompile.xml")
         courses_config = xmlop_obj.parse_courses_cfg("./cfg/courses/")
 
         ##########
         # do something with the options from cmd line and xml files
         # TODO: mhh... I'm not sure anymore that this makes sense?!
-        configs = self.__merge_configs(cmd_options, checkstyle_config, junit_config, courses_config)
+        configs = self.__merge_configs(cmd_options, checkstyle_config, junit_config, jcompile_config, courses_config)
 
         ##########
         # iterate over courses
@@ -151,7 +152,7 @@ class pyCheck(object):
                     if cmd_options.skip_compile is not True:
                         # TODO
                         print("Compiling java code...")
-                        jcompile_obj.compile_project(current_dir, course)
+                        jcompile_obj.compile_project(current_dir, jcompile_config, course)
 
                     ##########
                     # junit tests
@@ -217,7 +218,7 @@ class pyCheck(object):
         return options
 
 
-    def __merge_configs(self, cmd_options, checkstyle_config, junit_config, courses_config):
+    def __merge_configs(self, cmd_options, checkstyle_config, junit_config, jcompile_config, courses_config):
         """merge all configs to one object, that can be passed on to other functions"""
 
         # init empty dict
@@ -230,6 +231,7 @@ class pyCheck(object):
         ret["cmd_options"] = cmd_options
         ret["checkstyle_config"] = checkstyle_config
         ret["junit_config"] = junit_config
+        ret["jcompile_config"] = jcompile_config
         ret["courses_config"] = courses_config
 
         # return options

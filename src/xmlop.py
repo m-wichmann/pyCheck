@@ -84,6 +84,29 @@ class XMLOptionParser(object):
         return ret
 
 
+    def parse_jcompile_cfg(self, filepath):
+        """filepath is the path to the jcompile.xml"""
+
+        # parse file to tree
+        tree = dom.parse(filepath)
+
+        # init empty dict for return infos
+        ret = {}
+
+        # iterate through all childs of "head" node (config)
+        for element in tree.firstChild.childNodes:
+            # if node is of "type"
+            if element.nodeName == "bin-path": 
+                # access Text object and "info"
+                ret["bin-path"] = element.firstChild.data
+            if element.nodeName == "args": 
+                # access Text object and "info"
+                ret["args"] = element.firstChild.data
+
+        # return parsed data
+        return ret
+
+
     def parse_courses_cfg(self, dirpath):
         """dirpath has to be the path in wich all course configs are.
         This function return a list of all courses.
