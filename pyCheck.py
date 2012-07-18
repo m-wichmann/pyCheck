@@ -31,6 +31,7 @@ from optparse import OptionParser
 from optparse import OptionGroup
 import os
 import subprocess
+import threading
 import logging.handlers
 
 
@@ -180,8 +181,30 @@ class pyCheck(object):
 
         ##########
         # iterate over groups in ./tmp/GROUP/
+        # non threaded implementation
+#        for groupdir in groupdirs:
+#            self.__process_group(course, groupdir)
+
+        # threaded implementation
+        # TODO: get return var from thread
+
+        # define max thread count via semaphore
+        self.maxthreads = 10
+        self.sema_pool = threading.BoundedSemaphore(value=self.maxthreads)
+
+        # define all threads and then start them
+        threads = []
         for groupdir in groupdirs:
-            self.__process_group(course, groupdir)
+            temp_thread = (threading.Thread(target=self.__process_group, args=(course, groupdir)))
+            threads.append(temp_thread)
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+
+
+
+
 
         ##########
         # clean up the checkedout repo
@@ -191,6 +214,10 @@ class pyCheck(object):
 
     def __process_group(self, course, groupdir):
         """process one group (groupdir). Meaning: jcompile, junit, checkstyle"""
+
+        # aquire seamphore for threadcount
+        self.sema_pool.acquire()
+
         # TODO: maybe make this into a dict
         junit_results = []
         checkstyle_results = []
@@ -243,6 +270,9 @@ class pyCheck(object):
             util_obj.start_timer("output")
             output_obj.generate_result(junit_results, checkstyle_results, course)
             timing["output"].append(util_obj.stop_timer("output"))
+
+        # aquire seamphore for threadcount
+        self.sema_pool.release()
 
 
     def __pyCheck_cleanup(self):
